@@ -32,9 +32,9 @@ const authForgotPassword = async (email: string) => {
     return res?.data;
 }
 
-const authResetPassword = async (email: string, password:string) => {
+const authResetPassword = async (uuid: any, password:string) => {
     const res = await ApiClient.post('/reset-password', {
-        username: email,
+        uuid,
         password
     }).catch((err: any) => {
         console.log({ error: err?.response })

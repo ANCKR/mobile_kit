@@ -2,25 +2,70 @@ import ToastAlert from '@/components/ToastAlert';
 import { authUserSignup } from '@/services/auth.service';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as SecureStore from 'expo-secure-store'
+import { useMutation } from '@tanstack/react-query';
 
 export default function SignupScreen() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
+    const validateEmail = (text: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(text)) {
+            setEmailError('Invalid email format');
+        } else {
+            setEmailError('');
+        }
+    };
+
+    const validatePassword = (text: string) => {
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+        if (!passwordRegex.test(text)) {
+            setPasswordError(
+                'Password must contain at least one uppercase letter, one number, and one special character'
+            );
+        } else {
+            setPasswordError('');
+        }
+    };
+
+    const handleEmailChange = (text: string) => {
+        setEmail(text);
+        validateEmail(text);
+    };
+
+    const handlePasswordChange = (text: string) => {
+        setPassword(text);
+        validatePassword(text);
+    };
 
     const handleSignup = async () => {
-        const res = await authUserSignup(email, password);
-        const resMessage = res?.message;
-        ToastAlert("Alert!", resMessage);
-        if (res?.status == true) {
-            const accessToken = res?.data?.accessToken;
-            await SecureStore.setItemAsync("token", accessToken)
-            router.replace("/home")
-        }
-        return res;
+        if (emailError || passwordError) return ToastAlert("Error", "Invalid data added!")
+        await handleSignupMutate();
     }
+
+    const { isPending, data, mutate: handleSignupMutate } = useMutation({
+        mutationKey: ['forgot-password'],
+        mutationFn: async () => {
+            const res = await authUserSignup(email, password)
+            return res;
+        },
+        onSuccess: async (data) => {
+            const resMessage = data?.message;
+            ToastAlert("Alert!", resMessage);
+            if (data?.status == true) {
+                const accessToken = data?.data?.accessToken;
+                const refreshToken = data?.data?.refreshToken;
+                await SecureStore.setItemAsync("token", accessToken)
+                await SecureStore.setItemAsync("refreshToken", refreshToken)
+                router.replace("/home")
+            }
+        }
+    })
 
     return (
         <SafeAreaView className="flex-1 w-full items-center justify-center px-4 bg-white">
@@ -38,8 +83,9 @@ export default function SignupScreen() {
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                                 value={email}
-                                onChangeText={(text) => setEmail(text)}
+                                onChangeText={handleEmailChange}
                             />
+                            {emailError ? <Text className='text-red-500 text-xs'>{emailError}</Text> : null}
                         </View>
                         <View>
                             <Text className='block mb-2 text-sm font-medium text-gray-900'>Password</Text>
@@ -48,12 +94,17 @@ export default function SignupScreen() {
                                 placeholder="••••••••"
                                 secureTextEntry
                                 value={password}
-                                onChangeText={(text) => setPassword(text)}
+                                onChangeText={handlePasswordChange}
                             />
+                            {passwordError ? <Text className='text-red-500 text-xs'>{passwordError}</Text> : null}
                         </View>
 
                         <TouchableOpacity className='w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center' onPress={() => handleSignup()}>
-                            <Text className='text-white text-center'>Sign in</Text>
+                            {
+                                isPending ?
+                                    <ActivityIndicator color={"white"} /> :
+                                    <Text className='text-white text-center'>Sign Up</Text>
+                            }
                         </TouchableOpacity>
                         <View className='text-sm font-light text-gray-500 flex items-center'>
                             <TouchableOpacity onPress={() => router.push("/auth/login")}>

@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import * as SecureStore from 'expo-secure-store'
 import * as Linking from "expo-linking";
+import { useMutation } from '@tanstack/react-query';
+import { ActivityIndicator } from 'react-native';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
@@ -45,18 +47,30 @@ export default function LoginScreen() {
     };
 
     const handleLogin = async () => {
-        // Linking.openURL('myapp://dev/auth/signup')
+        // Linking.openURL('myapp://dev/auth/resetPassword?uuid=6352')
         // return;
         if (emailError || passwordError) return ToastAlert("Error", "Invalid data added!")
-        const res = await authUserLogin(email, password);
-        const resMessage = res?.message;
-        ToastAlert("Alert!", resMessage);
-        if (res?.status == true) {
-            const accessToken = res?.data?.accessToken;
-            await SecureStore.setItemAsync("token", accessToken)
-            router.replace("/home")
-        }
+        await handleLoginMutate();
     }
+
+    const { isPending, data, mutate: handleLoginMutate } = useMutation({
+        mutationKey: ['forgot-password'],
+        mutationFn: async () => {
+            const res = await authUserLogin(email, password)
+            return res;
+        },
+        onSuccess: async (data) => {
+            const resMessage = data?.message;
+            ToastAlert("Alert!", resMessage);
+            if (data?.status == true) {
+                const accessToken = data?.data?.accessToken;
+                const refreshToken = data?.data?.refreshToken;
+                await SecureStore.setItemAsync("token", accessToken)
+                await SecureStore.setItemAsync("refreshToken", refreshToken)
+                router.replace("/home")
+            }
+        }
+    })
 
     return (
         <SafeAreaView className="flex-1 w-full items-center justify-center px-4 bg-white">
@@ -76,7 +90,7 @@ export default function LoginScreen() {
                                 value={email}
                                 onChangeText={handleEmailChange}
                             />
-                            {emailError ? <Text>{emailError}</Text> : null}
+                            {emailError ? <Text className='text-red-500 text-xs'>{emailError}</Text> : null}
                         </View>
                         <View>
                             <Text className='block mb-2 text-sm font-medium text-gray-900'>Password</Text>
@@ -87,22 +101,29 @@ export default function LoginScreen() {
                                 value={password}
                                 onChangeText={handlePasswordChange}
                             />
-                            {passwordError ? <Text className='text-red-500'>{passwordError}</Text> : null}
+                            {passwordError ? <Text className='text-red-500 text-xs'>{passwordError}</Text> : null}
                         </View>
                         <View className='flex items-center justify-end'>
-                            <TouchableOpacity onPress={() => router.push("/auth/resetPassword")}>
+                            <TouchableOpacity onPress={() => {
+                                // router.push("/auth/forgotPassword")
+                                router.push("/auth/resetPassword/?uuid=4be023e1-de2d-4b81-9b6f-18f959d078dd")
+                            }}>
                                 <Text className='text-sm font-normal text-primary-600 hover:underline'>Forgot password?</Text>
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity className='w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center' onPress={() => handleLogin()}>
-                            <Text className='text-white text-center'>Sign in</Text>
+                            {
+                                isPending ?
+                                    <ActivityIndicator color={"white"} /> :
+                                    <Text className='text-white text-center'>Sign in</Text>
+                            }
                         </TouchableOpacity>
                         <View className='text-sm font-light text-gray-500 flex items-center'>
-                            <Text>
-                                Don’t have an account yet?{' '}
-                            </Text>
                             <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-                                <Text className='font-medium text-primary-600 hover:underline'>Sign up</Text>
+                                <Text>
+                                    Don’t have an account yet?{' '}
+                                </Text>
+                                {/* <Text className='font-medium text-primary-600 hover:underline'>Sign up</Text> */}
                             </TouchableOpacity>
                         </View>
                     </View>

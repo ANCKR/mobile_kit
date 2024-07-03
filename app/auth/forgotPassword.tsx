@@ -1,10 +1,24 @@
-import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity } from 'react-native';
+import ToastAlert from '@/components/ToastAlert';
+import { authForgotPassword } from '@/services/auth.service';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 export default function ForgotPsswordScreen() {
-    
-    const handleForgotPassword = () => {
-        
-    }
+    const [email, setEmail] = useState("");
+
+    const { isPending, data, mutate: handleForgotPassword } = useMutation({
+        mutationKey: ['forgot-password'],
+        mutationFn: async () => {
+            const res = await authForgotPassword(email)
+            console.log({ res })
+            return res;
+        },
+        onSuccess: (data) => {
+            const resMessage = data?.message;
+            ToastAlert("Success", resMessage);
+        }
+    })
 
     return (
         <SafeAreaView className="flex-1 w-full items-center justify-center px-4 bg-white">
@@ -14,6 +28,7 @@ export default function ForgotPsswordScreen() {
                         Forgot Password
                     </Text>
                     <View className='space-y-4 md:space-y-6'>
+                        <Text>Please enter your email for reseting your password</Text>
                         <View>
                             <Text className='block mb-2 text-sm font-medium text-gray-900'>Your email</Text>
                             <TextInput
@@ -21,17 +36,20 @@ export default function ForgotPsswordScreen() {
                                 placeholder="name@company.com"
                                 keyboardType="email-address"
                                 autoCapitalize="none"
-                                // value={email}
-                                // onChangeText={(text) => setEmail(text)}
+                                value={email}
+                                onChangeText={(text) => setEmail(text)}
                             />
                         </View>
-                        <TouchableOpacity className='w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center' >
-                            <Text className='text-white text-center'>Sign in</Text>
+                        <TouchableOpacity className='w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center' onPress={() => handleForgotPassword()}>
+                            {
+                                isPending ?
+                                    <ActivityIndicator color={"white"} /> :
+                                    <Text className='text-white text-center'>Send Code</Text>
+                            }
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
         </SafeAreaView>
-
     );
 }
