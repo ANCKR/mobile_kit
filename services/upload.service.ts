@@ -1,7 +1,6 @@
 import ApiClient from "@/utils/axios.util";
 
 const uploadImageToServer = async (formData: any) => {
-    console.log({ resPayload: formData })
     const res = await ApiClient.post('/uploadFile', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',

@@ -1,6 +1,9 @@
 import * as Notifications from "expo-notifications";
 import messaging from "@react-native-firebase/messaging";
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
+import ApiClient from "@/utils/axios.util";
+import * as SecureStore from "expo-secure-store"
+import Toast from 'react-native-toast-message';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -45,7 +48,8 @@ const notificationHandle = async () => {
         messaging()
             .getToken()
             .then(async (token) => {
-                console.log({token})
+                console.log({ token })
+                await SecureStore.setItemAsync("fcmToken", token);
                 fcmToken = token;
                 //   await SecureStore.setItemAsync("fcm_token", token);
             });
@@ -76,10 +80,15 @@ const notificationHandle = async () => {
     });
 
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-        Alert.alert(
-            `${remoteMessage.notification?.title}`,
-            `${remoteMessage.notification?.body}`
-        );
+        // Alert.alert(
+        //     `${remoteMessage.notification?.title}`,
+        //     `${remoteMessage.notification?.body}`
+        // );
+        Toast.show({
+            type: 'info',
+            text1: remoteMessage.notification?.title,
+            text2: remoteMessage.notification?.body
+        });
     });
 
     // Clean up the event listeners
@@ -89,4 +98,17 @@ const notificationHandle = async () => {
     };
 };
 
-export { notificationHandle };
+const sendNotification = async (payload: any) => {
+    const res = await ApiClient.post('/userNotification', payload)
+        .catch((err: any) => {
+            console.log({ error: err?.response })
+            console.log({ errorHeaders: err?.response?.responseHeaders })
+            return err?.response
+        })
+    return res?.data;
+}
+
+export {
+    notificationHandle,
+    sendNotification
+};

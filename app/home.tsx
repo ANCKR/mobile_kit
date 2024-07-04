@@ -5,7 +5,7 @@ import ImageUploader from "@/components/ImagePicker";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
-import { notificationHandle } from "@/services/notification.service";
+import { notificationHandle, sendNotification } from "@/services/notification.service";
 
 const HomeScreen = () => {
     const router = useRouter();
@@ -14,6 +14,15 @@ const HomeScreen = () => {
         await SecureStore.deleteItemAsync("token");
         router.replace("/auth/login")
         return;
+    }
+
+    const handleSendNotification = async () => {
+        const fcmToken=await SecureStore.getItemAsync("fcmToken");
+        const res = await sendNotification({
+            token: fcmToken,
+            body: "Body",
+            title: "Title"
+        });
     }
 
     useEffect(() => {
@@ -35,6 +44,9 @@ const HomeScreen = () => {
                 <View className="px-8">
                     <ImageUploader />
                 </View>
+                <TouchableOpacity className="bg-blue-400 p-4 rounded" onPress={() => handleSendNotification()}>
+                    <Text className="text-white">Send Notification</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )

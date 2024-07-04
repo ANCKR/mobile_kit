@@ -28,6 +28,7 @@ export default function ImageUploader() {
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
+            base64: true
         });
 
         console.log(result);
@@ -41,7 +42,7 @@ export default function ImageUploader() {
                 encoding: FileSystem.EncodingType.Base64,
             });
             const buffer = base64ToBuffer(fileBuffer);
-            console.log({buffer})
+            // console.log({buffer})
 
             // console.log({ fileBuffer, fileInfo })
             const formData: any = new FormData();
@@ -51,10 +52,10 @@ export default function ImageUploader() {
             //     name: result.name,
             //     file: result.uri
             // });
-            formData.append('file', {
-                ...result.assets[0],
-                buffer: fileBuffer
-            })
+            // formData.append('file', {
+            //     ...result.assets[0],
+            //     buffer: fileBuffer
+            // })
             console.log({ formData: formData?._parts[0] })
             // const res = await uploadImageToServer(formData)
             // console.log({ res })

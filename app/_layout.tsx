@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import useAuth from '@/hooks/useAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Linking from "expo-linking";
+import Toast from 'react-native-toast-message';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -63,32 +64,6 @@ export default function RootLayout() {
     },
   };
 
-  // useMemo(() => {
-  //   const handleDeepLink = (event: any) => {
-  //     const { url } = event;
-  //     const path = Linking.parse(url).path;
-  //     console.log({path})
-
-  //     // Use the parsed path to navigate to the appropriate screen
-  //     if (path) {
-  //       router.replace(path);
-  //     }
-  //   };
-
-  //   Linking.addEventListener('url', handleDeepLink);
-
-  //   // Handle initial URL if the app was opened from a deep link
-  //   Linking.getInitialURL().then((url) => {
-  //     if (url) {
-  //       handleDeepLink({ url });
-  //     }
-  //   });
-
-  //   return () => {
-  //     Linking.removeEventListener('url', handleDeepLink);
-  //   };
-  // }, [router]);
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
@@ -98,6 +73,7 @@ export default function RootLayout() {
           <Stack.Screen name="home" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
+        <Toast />
       </QueryClientProvider>
     </ThemeProvider>
   );
