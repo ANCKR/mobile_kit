@@ -105,8 +105,8 @@ export default function LoginScreen() {
                         </View>
                         <View className='flex items-center justify-end'>
                             <TouchableOpacity onPress={() => {
-                                // router.push("/auth/forgotPassword")
-                                router.push("/auth/resetPassword/?uuid=4be023e1-de2d-4b81-9b6f-18f959d078dd")
+                                router.push("/auth/forgotPassword")
+                                // router.push("/auth/resetPassword/?uuid=4be023e1-de2d-4b81-9b6f-18f959d078dd")
                             }}>
                                 <Text className='text-sm font-normal text-primary-600 hover:underline'>Forgot password?</Text>
                             </TouchableOpacity>
