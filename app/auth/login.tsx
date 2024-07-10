@@ -1,7 +1,7 @@
 import ToastAlert from '@/components/ToastAlert';
 import { authUserLogin } from '@/services/auth.service';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity } from 'react-native';
 import * as SecureStore from 'expo-secure-store'
 import * as Linking from "expo-linking";
@@ -75,6 +75,9 @@ export default function LoginScreen() {
     return (
         <SafeAreaView className="flex-1 w-full items-center justify-center px-4 bg-white">
             <View className='w-full bg-white rounded-lg shadow sm:max-w-md xl:p-0'>
+                <View className='mb-6 px-6'>
+                    <Text className='font-bold text-2xl text-gray-600'>Welcome back! Glad to see you, Again!</Text>
+                </View>
                 <View className='p-6 space-y-4 md:space-y-6 sm:p-8'>
                     <Text className='text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl'>
                         Sign in to your account
@@ -111,11 +114,11 @@ export default function LoginScreen() {
                                 <Text className='text-sm font-normal text-primary-600 hover:underline'>Forgot password?</Text>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity className='w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center' onPress={() => handleLogin()}>
+                        <TouchableOpacity className='w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-4 text-center' onPress={() => handleLogin()}>
                             {
                                 isPending ?
                                     <ActivityIndicator color={"white"} /> :
-                                    <Text className='text-white text-center'>Sign in</Text>
+                                    <Text className='text-white text-center text-sm font-bold'>Sign in</Text>
                             }
                         </TouchableOpacity>
                         <View className='text-sm font-light text-gray-500 flex items-center'>

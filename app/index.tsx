@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Redirect, router } from "expo-router"
 import { ActivityIndicator, Button, SafeAreaView, Text, TouchableOpacity, View } from "react-native"
@@ -22,7 +23,7 @@ const WelcomeScreen = () => {
         )
     } else {
         if (data == true) return <Redirect href={"/home"} />
-        else return <Redirect href={"/auth/login"} />
+        else return <Redirect href={"/auth/welcome"} />
     }
 
     return (

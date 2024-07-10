@@ -1,7 +1,7 @@
 import ToastAlert from '@/components/ToastAlert';
 import { authUserSignup } from '@/services/auth.service';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, Button, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as SecureStore from 'expo-secure-store'
 import { useMutation } from '@tanstack/react-query';
@@ -70,6 +70,9 @@ export default function SignupScreen() {
     return (
         <SafeAreaView className="flex-1 w-full items-center justify-center px-4 bg-white">
             <View className='w-full bg-white rounded-lg shadow sm:max-w-md xl:p-0'>
+                <View className='mb-6 px-6'>
+                    <Text className='font-bold text-2xl text-gray-600'>Hello! Register to get started</Text>
+                </View>
                 <View className='p-6 space-y-4 md:space-y-6 sm:p-8'>
                     <Text className='text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl'>
                         Register your account
@@ -107,7 +110,7 @@ export default function SignupScreen() {
                             }
                         </TouchableOpacity>
                         <View className='text-sm font-light text-gray-500 flex items-center'>
-                            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+                            <TouchableOpacity onPress={() => router.replace("/auth/login")}>
                                 <Text>
                                     Already a user?{' '}
                                 </Text>

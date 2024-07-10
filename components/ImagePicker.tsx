@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Image, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -50,11 +50,57 @@ export default function ImageUploader() {
     })
 
     return (
-        <View className='border-2 border-gray-200 rounded w-full flex flex-col space-y-4 px-4 py-10 justify-center items-center'>
-            <Ionicons name='cloud-upload' size={30} />
-            <Text>Upload Image</Text>
-            {image && <Image source={{ uri: image }} style={styles.image} />}
-            <TouchableOpacity className='bg-blue-500 rounded py-3 px-5' onPress={async () => {
+        // <View className='border-2 border-gray-200 rounded w-full flex flex-col space-y-4 px-4 py-10 justify-center items-center'>
+        //     <Ionicons name='cloud-upload' size={30} />
+        //     <Text>Upload Image</Text>
+        //     {image && <Image source={{ uri: image }} style={styles.image} />}
+        //     <TouchableOpacity className='bg-blue-500 rounded py-3 px-5' onPress={async () => {
+        //         if (isPending) return;
+        //         if (image) {
+        //             await uploadImageToServerHandle();
+        //         } else {
+        //             pickImage();
+        //         }
+        //     }}>
+        //         <Text className='text-white'>
+        //             {
+        //                 isPending ? "Please wait..." : image ? "Upload Image" : "Pick Image"
+        //             }
+        //         </Text>
+        //     </TouchableOpacity>
+        //     {
+        //         image && (
+        //             <TouchableOpacity className='bg-blue-500 rounded py-3 px-5' onPress={() => {
+        //                 setImage(null);
+        //                 setUploadedImageData(null);
+        //             }}>
+        //                 <Text className='text-white'>Remove Image</Text>
+        //             </TouchableOpacity>
+        //         )
+        //     }
+        // </View>
+        <>
+            <View className='bg-blue-900 flex flex-col justify-center items-center py-10 h-1/2'>
+                {image ? <Image source={{ uri: image }} style={styles.image} />
+                    :
+                    <Ionicons name='document' color={"white"} size={150} />
+                }
+                <Text className='text-xl text-white font-bold mt-4'>
+                    {
+                        image ? `${uploadedImageData?.fileName?.slice(0,20)}...` : "Upload Image"
+                    }
+                </Text>
+                <Text className='text-xs mt-2 text-gray-200'>Upload any image from your device gallery</Text>
+                {
+                    image && <TouchableOpacity className='mt-6' onPress={() => {
+                        setImage(null);
+                        setUploadedImageData(null);
+                    }}>
+                        <Text className='text-gray-300'>Remove Image</Text>
+                    </TouchableOpacity>
+                }
+            </View>
+            <TouchableOpacity className='bg-yellow-600 w-1/2 rounded-xl py-4 items-center self-center -mt-8 flex items-center' onPress={async () => {
                 if (isPending) return;
                 if (image) {
                     await uploadImageToServerHandle();
@@ -62,23 +108,14 @@ export default function ImageUploader() {
                     pickImage();
                 }
             }}>
-                <Text className='text-white'>
+                <Ionicons name='image' color={"white"} size={20} />
+                <Text className='text-white text-lg font-bold'>
                     {
                         isPending ? "Please wait..." : image ? "Upload Image" : "Pick Image"
                     }
                 </Text>
             </TouchableOpacity>
-            {
-                image && (
-                    <TouchableOpacity className='bg-blue-500 rounded py-3 px-5' onPress={() => {
-                        setImage(null);
-                        setUploadedImageData(null);
-                    }}>
-                        <Text className='text-white'>Remove Image</Text>
-                    </TouchableOpacity>
-                )
-            }
-        </View>
+        </>
     );
 }
 
